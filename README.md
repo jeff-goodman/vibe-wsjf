@@ -1,72 +1,72 @@
 # WSJF Calculator
 
-A web application for calculating Weighted Shortest Job First (WSJF) prioritization for features and user stories. WSJF is a prioritization model used in Agile and SAFe methodologies that helps teams prioritize work based on the Cost of Delay and job size.
+A simple, interactive Weighted Shortest Job First (WSJF) calculator built with React. This tool helps teams prioritize work by calculating WSJF scores based on business value, time criticality, risk reduction, and job size.
 
 ## Features
 
-- Add multiple features with their respective parameters
-- Calculate WSJF scores automatically
-- View prioritized features in a clear table format
-- Modern, responsive user interface
-- Real-time calculations
+- Drag and drop interface for ranking features
+- Automatic Fibonacci scoring (1, 2, 3, 5, 8, 13)
+- Real-time WSJF calculation
+- Visual formula breakdown for each feature
+- Fun confetti animation when adding new features
 
-## Installation
+## Live Demo
+
+Try it out at: [https://vibe-wsjf.vercel.app](https://vibe-wsjf.vercel.app)
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+
+### Installation
 
 1. Clone the repository:
 
-```bash
-git clone <repository-url>
-cd wsjf-calculator
-```
+   ```bash
+   git clone https://github.com/yourusername/vibe-wsjf.git
+   cd vibe-wsjf
+   ```
 
 2. Install dependencies:
 
-```bash
-npm run install-all
-```
+   ```bash
+   cd client
+   npm install
+   ```
 
-## Running the Application
+3. Start the development server:
+   ```bash
+   npm start
+   ```
 
-1. Start both the frontend and backend servers:
+The app will open in your browser at [http://localhost:3000](http://localhost:3000).
 
-```bash
-npm run dev
-```
+## How to Use
 
-The application will be available at:
+1. Enter a feature name and press Enter to add it
+2. Drag features up and down in each column to rank them
+3. Use the dropdown for middle items to select their score (2, 3, 5, or 8)
+4. View the WSJF calculation table at the bottom
+5. Click the calculator icon (🧮) to see the formula breakdown for any feature
 
-- Frontend: http://localhost:3000
-- Backend: http://localhost:5000
+## Deployment
 
-## Usage
+This app is deployed on Vercel:
 
-1. Add features by clicking the "Add Feature" button
-2. For each feature, enter:
-   - Feature name
-   - Business Value (1-10)
-   - Time Criticality (1-10)
-   - Risk Reduction (1-10)
-   - Job Size (1-10)
-3. Click "Calculate WSJF" to see the prioritized list
-4. Features are automatically sorted by their WSJF score
-
-## WSJF Calculation
-
-WSJF is calculated using the formula:
-
-```
-WSJF = (Business Value + Time Criticality + Risk Reduction) / Job Size
-```
-
-Where:
-
-- Business Value: The value the feature brings to the business
-- Time Criticality: How time-sensitive the feature is
-- Risk Reduction: How much risk is reduced by implementing this feature
-- Job Size: The relative size of the work (larger numbers = larger size)
+- Automatic deployments from the main branch
+- HTTPS enabled
+- Global CDN for fast loading
 
 ## Technologies Used
 
-- Frontend: React.js
-- Backend: Node.js, Express
-- Styling: CSS3
+- React
+- React Beautiful DnD for drag and drop
+- React Confetti for animations
+- Vercel for hosting
+
+## License
+
+This project is licensed under the MIT License.
