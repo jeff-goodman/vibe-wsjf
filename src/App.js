@@ -1,9 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import ReactConfetti from 'react-confetti';
+import {
+  initGA,
+  trackPageView,
+  trackFeatureInteraction,
+} from './utils/analytics';
 import './App.css';
 
 const FIBONACCI_SCORES = [1, 2, 3, 5, 8, 13];
+
+// Initialize GA4 with your Measurement ID
+const GA_MEASUREMENT_ID = 'G-E8KBGMD17K'; // Your actual Measurement ID
 
 function App() {
   const [newFeature, setNewFeature] = useState('');
@@ -58,10 +66,19 @@ function App() {
     calculateWSJF();
   }, [rankings]);
 
+  useEffect(() => {
+    // Initialize GA4
+    initGA(GA_MEASUREMENT_ID);
+    // Track initial page view
+    trackPageView(window.location.pathname);
+  }, []);
+
   const handleAddFeature = (e) => {
     e.preventDefault();
     if (newFeature.trim()) {
-      // Show confetti immediately
+      // Track feature creation
+      trackFeatureInteraction('create', newFeature.trim());
+
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
 
@@ -69,7 +86,6 @@ function App() {
         id: Date.now().toString(),
         name: newFeature.trim(),
         position: 0,
-        // Don't set an initial score, let assignFibonacciScores handle it
       };
 
       setRankings((prev) => ({
@@ -88,16 +104,15 @@ function App() {
 
   const assignFibonacciScores = (items) => {
     if (items.length === 0) return [];
-    if (items.length === 1) return [{ ...items[0], score: 13 }];
+    if (items.length === 1) return [{ ...items[0], score: 1 }];
 
     // Sort items by position
     const sortedItems = [...items].sort((a, b) => a.position - b.position);
 
-    // First item gets 13, last item gets 1, middle items get 2 if no score is set
+    // Last item gets 1, other items keep their current score or default to 2
     return sortedItems.map((item, index) => {
-      if (index === 0) return { ...item, score: 13 };
       if (index === sortedItems.length - 1) return { ...item, score: 1 };
-      return { ...item, score: item.score ?? 2 }; // Use nullish coalescing to set default to 2
+      return { ...item, score: item.score ?? 2 };
     });
   };
 
@@ -109,6 +124,16 @@ function App() {
     // Only allow dragging within the same column
     if (source.droppableId !== destination.droppableId) {
       return;
+    }
+
+    // Track feature movement
+    const feature = rankings[source.droppableId][source.index];
+    if (feature) {
+      trackFeatureInteraction('move', feature.name, {
+        column: source.droppableId,
+        fromPosition: source.index,
+        toPosition: destination.index,
+      });
     }
 
     const items = [...rankings[source.droppableId]];
@@ -128,17 +153,52 @@ function App() {
   };
 
   const handleScoreChange = (columnId, itemId, newScore) => {
-    setRankings((prev) => {
-      const newRankings = { ...prev };
-      const column = [...newRankings[columnId]];
-      const itemIndex = column.findIndex((item) => item.id === itemId);
+    // Track score change
+    const feature = rankings[columnId].find((item) => item.id === itemId);
+    if (feature) {
+      trackFeatureInteraction('score_change', feature.name, {
+        column: columnId,
+        newScore: newScore,
+      });
+    }
 
+    setRankings((prev) => {
+      // Create a new rankings object
+      const newRankings = { ...prev };
+
+      // Get the current column and create a copy
+      const currentColumn = [...newRankings[columnId]];
+
+      // Find and update the item's score
+      const itemIndex = currentColumn.findIndex((item) => item.id === itemId);
       if (itemIndex !== -1) {
-        column[itemIndex] = { ...column[itemIndex], score: newScore };
-        newRankings[columnId] = column;
+        currentColumn[itemIndex] = {
+          ...currentColumn[itemIndex],
+          score: newScore,
+        };
       }
 
-      return newRankings;
+      // Separate the bottom item
+      const bottomItem = currentColumn[currentColumn.length - 1];
+      const itemsToSort = currentColumn.slice(0, -1);
+
+      // Sort the items by score (descending)
+      itemsToSort.sort((a, b) => b.score - a.score);
+
+      // Combine sorted items with bottom item
+      const sortedColumn = [...itemsToSort, bottomItem];
+
+      // Update positions
+      const finalColumn = sortedColumn.map((item, index) => ({
+        ...item,
+        position: index,
+      }));
+
+      // Update the rankings state
+      newRankings[columnId] = finalColumn;
+
+      // Force a re-render by creating a new object
+      return { ...newRankings };
     });
   };
 
@@ -189,10 +249,25 @@ function App() {
     // Sort by WSJF score (descending)
     scores.sort((a, b) => b.wsjfScore - a.wsjfScore);
     setWsjfScores(scores);
+
+    // Track WSJF calculation
+    trackFeatureInteraction('calculate_wsjf', 'all_features', {
+      featureCount: scores.length,
+      highestScore: scores[0]?.wsjfScore,
+      lowestScore: scores[scores.length - 1]?.wsjfScore,
+    });
   };
 
   const showFormulaModal = (feature) => {
     setSelectedFeature(feature);
+    // Track formula modal view
+    trackFeatureInteraction('view_formula', feature.featureName, {
+      businessValue: feature.businessValue,
+      timeCriticality: feature.timeCriticality,
+      riskReduction: feature.riskReduction,
+      jobSize: feature.jobSize,
+      wsjfScore: feature.wsjfScore,
+    });
   };
 
   const closeModal = () => {
@@ -292,7 +367,7 @@ function App() {
             >
               {items.map((item, index) => (
                 <Draggable
-                  key={`${droppableId}-${item.id}`}
+                  key={`${droppableId}-${item.id}-${index}`}
                   draggableId={`${droppableId}-${item.id}`}
                   index={index}
                 >
@@ -305,7 +380,7 @@ function App() {
                     >
                       <div className="item-content">
                         <span className="feature-name">{item.name}</span>
-                        {index === 0 || index === items.length - 1 ? (
+                        {index === items.length - 1 ? (
                           <span className="score-badge">{item.score}</span>
                         ) : (
                           <div className="score-select-wrapper">
