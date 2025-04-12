@@ -21,6 +21,20 @@ function App() {
     height: window.innerHeight,
   });
   const inputRef = useRef(null);
+  const [showPopover, setShowPopover] = useState(false);
+  const [popoverContent, setPopoverContent] = useState('');
+  const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
+
+  const columnInfo = {
+    businessValue:
+      'Business Value represents the economic benefit of the feature. Higher values indicate features that deliver more value to the business.',
+    timeCriticality:
+      'Time Criticality measures how time-sensitive the feature is. Higher values indicate features that must be delivered soon to maintain value.',
+    riskReduction:
+      'Risk Reduction/Opportunity Enablement represents how much the feature reduces risk or enables future opportunities. Higher values indicate features that significantly reduce risk or enable important opportunities.',
+    jobSize:
+      'Job Size represents the relative effort required to implement the feature. Lower values indicate smaller, easier-to-implement features.',
+  };
 
   useEffect(() => {
     if (inputRef.current) {
@@ -230,11 +244,45 @@ function App() {
     );
   };
 
+  const handleInfoClick = (column, event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setPopoverPosition({
+      top: rect.bottom + 5,
+      left: rect.left,
+    });
+    setPopoverContent(columnInfo[column]);
+    setShowPopover(true);
+  };
+
+  const handleInfoMouseLeave = () => {
+    setShowPopover(false);
+  };
+
   const renderRankingColumn = (title, droppableId) => {
     const items = assignFibonacciScores(rankings[droppableId]);
     return (
       <div className="ranking-column">
-        <h3>{title}</h3>
+        <div className="column-header">
+          <h3>{title}</h3>
+          <div
+            className="info-icon-wrapper"
+            onMouseEnter={(e) => handleInfoClick(droppableId, e)}
+            onMouseLeave={handleInfoMouseLeave}
+          >
+            <span className="info-icon">ℹ️</span>
+          </div>
+        </div>
+        {showPopover && (
+          <div
+            className="popover"
+            style={{
+              top: `${popoverPosition.top}px`,
+              left: `${popoverPosition.left}px`,
+            }}
+          >
+            {popoverContent}
+          </div>
+        )}
         <Droppable droppableId={droppableId}>
           {(provided) => (
             <div

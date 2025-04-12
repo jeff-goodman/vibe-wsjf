@@ -381,3 +381,59 @@
   font-family: monospace;
   text-align: center;
 }
+
+.column-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.info-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: help;
+  margin-top: -2px;
+}
+
+.info-icon {
+  font-size: 16px;
+  color: #666;
+  transition: color 0.2s;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.info-icon-wrapper:hover .info-icon {
+  color: #333;
+}
+
+.popover {
+  position: fixed;
+  background: white;
+  border: none;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
