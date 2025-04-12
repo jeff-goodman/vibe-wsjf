@@ -9,6 +9,7 @@ node_modules/
 # Production
 /build
 /dist
+/.vercel
 
 # Misc
 .DS_Store
