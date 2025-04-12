@@ -4,7 +4,7 @@ This repo was fully made as an experiment in vibe coding.
 
 The code in it is not my own, this section of the readme is the only part that I have written.
 
-I consider the experiment to be a mixed success. Large functionality ended up getting removed because it wasn't successful in the limited time available for the experiment.
+I consider the experiment to be a less than mixed success. Although what is there now (mostly) works, large functionality ended up getting removed because it wasn't successful in the time available for the experiment. Existing functionality kept getting broken, it regularly tried force installing incompatible versions of packages and wasted time on dead ends, and my Vercel account details almost got committed, and I had to manually fix a git problem with committed node_modules because it couldn't fix it itself.
 
 Personally, after doing this experiment I would not recommend vibe coding for any code that you need to maintain or support on an ongoing basis, or for learning, or for any commercial activity. It is fine for a bit of weekend fun, but thats where it ends. Switch your Cursor or VS Code from Agent mode back to Ask mode and retain control.
 
